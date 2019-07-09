@@ -55,6 +55,8 @@ class _ZoomableImageState extends State<ZoomableImage> {
 
   Size _canvasSize;
 
+  ImageStreamListener _imageStreamListener;
+
   void _centerAndScaleImage() {
     _imageSize = new Size(
       _image.width.toDouble(),
@@ -158,6 +160,12 @@ class _ZoomableImageState extends State<ZoomableImage> {
   }
 
   @override
+  void initState() {
+    _imageStreamListener = ImageStreamListener(_handleImageLoaded);
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
     _resolveImage();
     super.didChangeDependencies();
@@ -171,7 +179,7 @@ class _ZoomableImageState extends State<ZoomableImage> {
 
   void _resolveImage() {
     _imageStream = widget.image.resolve(createLocalImageConfiguration(context));
-    _imageStream.addListener(_handleImageLoaded);
+    _imageStream.addListener(_imageStreamListener);
   }
 
   void _handleImageLoaded(ImageInfo info, bool synchronousCall) {
@@ -183,7 +191,7 @@ class _ZoomableImageState extends State<ZoomableImage> {
 
   @override
   void dispose() {
-    _imageStream.removeListener(_handleImageLoaded);
+    _imageStream.removeListener(_imageStreamListener);
     super.dispose();
   }
 }
